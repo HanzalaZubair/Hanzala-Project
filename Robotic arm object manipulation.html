@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Robotic Arm Control</title>
+    <style>
+        *{
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
+        body{
+            background-image: url('back.avif');
+            background-repeat: no-repeat;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+        header{
+            margin:75px auto;
+            width: 500px;
+        }
+        header button{
+            padding: 10px;
+        }
+        .stop, .settings{
+            margin-right: 25px;
+        }
+        .start{
+            margin-right: 200px;
+        }
+        .up, .down{
+            margin-left: 175px;
+        }
+        .left,.right, .lift, .place{
+            margin-left: 95px;
+        }
+
+        .rotateleft,.rotateright{
+            margin-left: 30px;
+            height: 60px;
+        }
+
+        /* Common Styles */
+        * {
+            padding: 0; margin: 0; box-sizing: border-box;
+        }
+        body {
+            background-image: url('back.avif');
+            background-repeat: no-repeat;
+            color: white;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+        }
+
+        .home {
+            margin: 30px 0px ;
+            text-align: center;
+        }
+
+        .home p {
+            margin: 10px 0px;
+            font-size: 18px;
+        }
+
+        /* Login Form */
+        .login {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin: 20px auto;
+            font-size: 20px;
+        }
+
+        .login form {
+            width: 100%;
+            max-width: 400px;
+            background: rgb(105, 100, 100); 
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin: auto;
+        }
+
+        .login h2 {
+            text-align: center;
+            text-decoration: underline red 2px;
+            text-underline-offset: 7px;
+            margin-bottom: 20px;
+        }
+
+        .login label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .login input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 18px;
+        }
+
+        .login button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .login button:hover {
+            background-color: #45a049;
+        }
+
+        .login-options {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .login-options a {
+            text-decoration: none;
+            font-size: 16px;
+            color: white;
+        }
+
+        .login-options a:hover {
+            text-decoration: underline;
+        }
+
+        .dashboard {
+            display: none;
+            text-align: center;
+            margin-top: 30px;
+        }
+        .dashboard ul {
+            margin-top: 15px;
+            background: rgb(105, 100, 100); 
+            border: 3px solid white;
+            width: 20%;
+            list-style: none;
+            margin: 10px auto;
+            height: 300px;
+            padding: 10px 0px;
+        }
+        .dashboard ul li {
+            margin: 7px 0px;
+        }
+        .dash button {
+            padding: 10px 20px;
+            font-size: 20px;
+            color: white;
+            background-color: #45a049;
+        }
+
+    </style>
+    <style>
+              .box{
+            padding: 20px;
+        }
+        .search{
+            margin-top: 10px;
+        }
+        .search input{
+            font-size: 16px;
+            padding: 8px;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .search .filterbtn{
+            font-size: 18px;
+            padding: 6px 20px;
+            background-color: rgb(100, 100, 240);
+            color: white;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        button:hover{
+            cursor: pointer;
+        }
+        table tbody button{
+            font-size: 16px;
+            width: 80px;
+            padding: 6px 0px;
+            background-color: rgb(100, 100, 240);
+            color: white;
+            border-radius: 5px;
+        }
+
+        table{
+            margin-top: 20px;
+            border-collapse: collapse;
+            border: 3px;
+            font-size: 18px;
+            color: white;
+            background-color: grey;
+        }
+        td,th{
+            padding: 10px 30px;
+            border: 3px solid black;
+        }
+        thead{
+            font-size: 20px;
+            font-weight: bolder;
+            background-color: grey;
+        }
+
+        .editdel{
+            text-align: right;
+            width: 1000px;
+            margin-top: 20px;
+        }
+
+        table .edit{
+            margin-right: 10px;
+        }
+        table .del{
+            background-color: rgb(243, 43, 43);
+        }
+    </style>
+</head>
+<body>
+    <!-- Home (Landing Page) -->
+    <div class="home" id="home">
+        <h1>Robotic Arm Object Manipulation</h1>
+        <p>The Robotic Arm Control System allows you to manage and control advanced robotic arms efficiently. 
+            Experience seamless operation with cutting-edge features.</p>
+        <p>Log in or sign up to get started!</p>
+    </div>
+
+    <!-- Login Form -->
+    <div class="login" id="loginForm">
+        <form action="javascript:void(0);" method="POST">
+            <h2>Login</h2>
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter Username">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter Password">
+            <button onclick="login()">Login</button>
+            <div class="login-options">
+                <a href="#">Forgot Password?</a> | 
+                <a href="#">Sign Up</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <h2>Welcome to the Dashboard</h2>
+        <ul class="dash">
+            <li><button onclick="goToControlPage()">Robot Control</button></li>
+            <li><button onclick="userManagement()">User Management</button></li>
+            <li><button onclick="logout()">Logout</button></li>
+        </ul>
+    </div>
+
+    <!-- Robot Control Page -->
+    <div id="controlPage" style="display: none;">
+        <h1 style="background-color: grey; text-align: center; height: 50px; align-content: center; color: white;">Robotic Arm Control</h1>
+        <header>
+            <button class="stop"><i class="fa fa-play-circle-o" style="font-size:36px;"></i></button>
+            <button class="start"><i class="fa fa-pause-circle" style="font-size:36px"></i></button>
+            <button class="settings"><i class="fa fa-gear" style="font-size:36px;"></i></button>
+            <button class="return" onclick="returnToDashboard()"><i class="fa fa-reply" style="font-size:36px"></i></button>
+
+            <br><br><br>
+
+            <button class="up"><i class="fa fa-arrow-circle-up" style="font-size:36px"></i></button>
+            <br>   
+            <button class="left"><i class="fa fa-arrow-circle-left" style="font-size:36px"></i></button>
+            <button class="right"><i class="fa fa-arrow-circle-right" style="font-size:36px;"></i></button>
+            <button class="rotateleft"><span style='font-size:36px; font-weight: 900;'>&#8634;</span></button>
+            <button class="rotateright"><span style='font-size:36px; font-weight: 900;'>&#8635;</span></button>
+            <br>   
+            <button class="down"><i class="fa fa-arrow-circle-down" style="font-size:36px"></i></button>
+            <br><br><br>
+
+            <button class="lift"><i class="fa fa-upload" style="font-size:36px"></i></button>
+            <button class="place"><i class="fa fa-download" style="font-size:36px"></i></button>
+        </header>
+    </div>
+
+    <script>
+        // User Management function
+        function userManagement() {
+            // Hide all other sections
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('controlPage').style.display = 'none'; // Assuming this is another section
+            document.getElementById('home').style.display = 'none';
+    
+            // Show the User Management page
+            document.getElementById('userManagementPage').style.display = 'block';
+        }
+    
+        // Back to Dashboard function
+        function returnToDashboard() {
+            // Hide the User Management page
+            document.getElementById('userManagementPage').style.display = 'none';
+    
+            // Show the Dashboard
+            document.getElementById('dashboard').style.display = 'block';
+        }
+    </script>
+    
+    <script>
+
+        // Default credentials
+        const defaultUsername = "admin";
+        const defaultPassword = "password123";
+
+        // Ensure default state is logged out
+        if (localStorage.getItem('loggedIn') === null) {
+            localStorage.setItem('loggedIn', 'false');
+        }
+
+        // Check if user is already logged in
+        if (localStorage.getItem('loggedIn') === 'true') {
+            showDashboard();
+        } else {
+            showLoginForm();
+        }
+
+        // Login function
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === defaultUsername && password === defaultPassword) {
+                // Store login state in localStorage
+                localStorage.setItem('loggedIn', 'true');
+                showDashboard();
+            } else {
+                alert('Invalid username or password!');
+            }
+        }
+
+        // Show the dashboard and hide the login form
+        function showDashboard() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('home').style.display = 'none';
+        }
+
+        // Show the login form and hide the dashboard
+        function showLoginForm() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('home').style.display = 'none';
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.setItem('loggedIn', 'false');
+            showLoginForm();
+        }
+
+        // Go to Robot Control Page
+        function goToControlPage() {
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('controlPage').style.display = 'block';
+        }
+
+        // Go back to the dashboard
+        function returnToDashboard() {
+            document.getElementById('controlPage').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+        }
+
+        // User Management function (dummy function)
+        function userManagement() {
+            alert("User management functionality not implemented yet.");
+        }
+    </script>
+
+    <!-- User Management Page -->
+<div id="userManagementPage" style="display: none;">
+    <div class="box">
+        <h1 style="background-color: grey; padding: 6px 0px;">User Management</h1>
+        <button onclick="returnToDashboard()" style="margin-bottom: 20px; font-size: 18px;">Back to Dashboard</button>
+        <div class="search">
+            <label for=""><input type="search" placeholder="Search Users"> <button class="filterbtn">Filter</button></label>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <td>User ID</td>
+                    <td>Email</td>
+                    <td>Name</td>
+                    <td>Role</td>
+                    <td>Last Seen</td>
+                    <td>Actions</td>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>001</td>
+                    <td>John Doe</td>
+                    <td>john.doe@gmail.com</td>
+                    <td>Admin</td>
+                    <td>23/10/24</td>
+                    <td><button>Edit</button></td>
+                </tr>
+                <tr>
+                    <td>002</td>
+                    <td>Jane Smith</td>
+                    <td>jane.smith@gmail.com</td>
+                    <td>User</td>
+                    <td>24/10/24</td>
+                    <td><button>View</button></td>
+                </tr>
+                <tr>
+                    <td>003</td>
+                    <td>Micheal Johnson</td>
+                    <td>micheal.johnson@gmail.com</td>
+                    <td>User</td>
+                    <td>24/10/24</td>
+                    <td><button>View</button></td>
+                </tr>
+                <tr>
+                    <td>004</td>
+                    <td>Emily Brown</td>
+                    <td>emily.brown@gmail.com</td>
+                    <td>Moderator</td>
+                    <td>25/10/24</td>
+                    <td><button>Edit</button></td>
+                </tr>
+                <tr>
+                    <td>005</td>
+                    <td>David Wilson</td>
+                    <td>david.wilson@gmail.com</td>
+                    <td>User</td>
+                    <td>24/10/24</td>
+                    <td><button>View</button></td>
+                </tr>
+                <tr>
+                    <td>006</td>
+                    <td>Sarah White</td>
+                    <td>sarah.white@gmail.com</td>
+                    <td>Admin</td>
+                    <td>23/10/24</td>
+                    <td><button>Edit</button></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="editdel">
+            <button class="edit">Edit</button>
+            <button class="del">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // User Management function
+    function userManagement() {
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('userManagementPage').style.display = 'block';
+
+    }
+
+    // Back to Dashboard function
+    function returnToDashboard() {
+        document.getElementById('userManagementPage').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
